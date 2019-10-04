@@ -1,49 +1,119 @@
 #include <mitsuba/render/scene.h>
+#include <mitsuba/core/statistics.h>
 
 MTS_NAMESPACE_BEGIN
 
-class shadow_integrator : public SamplingIntegrator {
+static StatsCounter avgPathLength("shadow tracer", "Average path length", EAverage);
+
+class shadow_integrator : public MonteCarloIntegrator {
 public:
 	MTS_DECLARE_CLASS()
 
 public:
-	shadow_integrator(const Properties& props) :SamplingIntegrator(props) {
-		Spectrum default_color;
-		default_color.fromLinearRGB(0.2f, 0.5f, 0.2f);
-		m_color = props.getSpectrum("color", default_color);
-	}
+	shadow_integrator(const Properties& props) :MonteCarloIntegrator(props) {}
 
 	// unserialize, in order
 	shadow_integrator(Stream* stream, InstanceManager* manager) :
-		SamplingIntegrator(stream, manager) {
-		m_color = Spectrum(stream);
-		m_max_dist = stream->readFloat();
-	}
+		MonteCarloIntegrator(stream, manager) {}
 
 	// serialize
 	void serialize(Stream* stream, InstanceManager* manager) const {
 		SamplingIntegrator::serialize(stream, manager);
-		m_color.serialize(stream);
-		stream->writeFloat(m_max_dist);
+	}
+
+	std::string toString() const {
+		std::ostringstream oss;
+		oss << "MIPathTracer[" << endl
+			<< "  maxDepth = " << m_maxDepth << "," << endl
+			<< "  rrDepth = " << m_rrDepth << "," << endl
+			<< "  strictNormals = " << m_strictNormals << endl
+			<< "]";
+		return oss.str();
+	}
+
+	inline Float miWeight(Float pdfA, Float pdfB) const {
+		pdfA *= pdfB;
+		pdfB *= pdfB;
+		return pdfA / (pdfA + pdfB);
 	}
 
 	/// Query for an unbiased estimate of the radiance along r
-	Spectrum Li(const RayDifferential& r, RadianceQueryRecord& rRec) const {
-		typedef TVector3<Float> vec3;
-		if (rRec.rayIntersect(r)) {
-			Float distance = rRec.its.t;
-			vec3 normal_value = vec3(rRec.its.shFrame.n.x, rRec.its.shFrame.n.y, rRec.its.shFrame.n.z);
-			Log(EInfo, (std::string("before: ") + normal_value.toString()).c_str());
-			normal_value = 0.5f * normalize(normal_value) + vec3(0.5f);
-			Log(EInfo, (std::string("after: ") + normal_value.toString()).c_str());
+	Spectrum Li(const RayDifferential& r, RadianceQueryRecord& rRec) const { 
+		const Scene *scene = rRec.scene;
+		Intersection &its = rRec.its;
+		RayDifferential ray(r);
+		Spectrum Li(0.0f);
+		bool scattered = false;
 
-			Spectrum ret;
-			ret.fromLinearRGB(normal_value.x, normal_value.y, normal_value.z);
+		// Perform the first ray intersection
+		rRec.rayIntersect(ray);
+		ray.mint = Epsilon;
 
-			return ret;
-		}
+		Spectrum throughput(1.0f);
+		Float eta = 1.0f;
 
-		return Spectrum(0.0f);
+		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
+			if (!its.isValid()) {
+				break;
+			}
+
+			const BSDF *bsdf = its.getBSDF(ray);
+
+			/* Possibly include emitted radiance*/
+			if(its.isEmitter() && (rRec.type & RadianceQueryRecord::EEmittedRadiance) && (!m_hideEmitters || scattered)) {
+				/*Li += throughput * its.Le(-ray.d);*/
+				break;
+			}
+			
+			if((rRec.depth >= m_maxDepth && m_maxDepth > 0) || (m_strictNormals && dot(ray.d, its.geoFrame.n) * Frame::cosTheta(its.wi) >=0)) {
+				/*
+					Only continue if: 
+						1. The current path lenght is below the specified maximum
+						2. If 'strictNormals' = true, when the geometric and shading 
+						   normals classify the incident direction to the same side
+				*/
+
+				break;
+			}
+
+			/* ==================================================================== */
+			/*                     Direct illumination sampling                     */
+			/* ==================================================================== */
+			/* estimate the direct illumination if this is requested */
+			DirectSamplingRecord dRec(its);
+			if(rRec.type  & RadianceQueryRecord::EDirectSurfaceRadiance && (bsdf->getType() & BSDF::ESmooth)) {
+				Spectrum value = scene->sampleEmitterDirect(dRec, rRec.nextSample2D());
+
+				//if(!value.isZero()) {
+				//	const Emitter *emitter = static_cast<const Emitter *>(dRec.object);
+				//	
+				//	/* Allocate a record for querying the BSDF */
+				//	BSDFSamplingRecord bRec(its, its.toLocal(dRec.d), ERadiance);
+
+				//	/* Evaluate BSDF * cos(theta) */
+				//	const Spectrum bsdfVal = bsdf->eval(bRec);
+
+				//	/* Prevent light leaks due ot the use of shading normals */
+				//	if(!bsdfVal.isZero() && (!m_strictNormals || dot(its.geoFrame.n, dRec.d) * Frame::cosTheta(bRec.wo) > 0)) {
+				//		/* Calculate prob. of having generated that direction using BSDF sampling */
+				//		Float bsdfPdf = (emitter->isOnSurface() && dRec.measure == ESolidAngle) ? bsdf->pdf(bRec) : 0;
+				//		Float weight = miWeight(dRec.pdf, bsdfPdf);
+				//		
+				//		Li += throughput * value * bsdfVal * weight;
+				//	}
+				//}
+
+				if(value.isZero()) {
+					Spectrum shadow_value;
+					shadow_value.fromLinearRGB(0.0f, 0.5f, 0.0f);
+					Li += throughput * shadow_value;
+				}
+			}
+
+			break;
+		} 
+
+		return Li;
 	}
 
 
