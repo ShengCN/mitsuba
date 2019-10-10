@@ -63,7 +63,7 @@ public:
 
 		Vector rd = Vector(std::cos(beta) * std::cos(alpha), std::sin(beta), std::cos(beta) * std::sin(alpha));
 		RayDifferential ray(r);
-		ray.d = rd;
+		// ray.d = rd;
 		
 		Spectrum Li(0.0f);
 		//// rd = (rd + Vector(1.0)) * 0.5;
