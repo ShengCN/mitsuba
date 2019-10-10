@@ -1,5 +1,6 @@
 #include <mitsuba/render/scene.h>
 #include <mitsuba/core/statistics.h>
+#include <regex>
 
 MTS_NAMESPACE_BEGIN
 
@@ -23,7 +24,7 @@ public:
 
 	std::string toString() const {
 		std::ostringstream oss;
-		oss << "MIPathTracer[" << endl
+		oss << "Shadow Detection[" << endl
 			<< "  maxDepth = " << m_maxDepth << "," << endl
 			<< "  rrDepth = " << m_rrDepth << "," << endl
 			<< "  strictNormals = " << m_strictNormals << endl
@@ -52,8 +53,38 @@ public:
 		Spectrum throughput(1.0f);
 		Float eta = 1.0f;
 
+		auto check_is_ground_floor=[](std::string name) {
+			std::regex e("(.*)(gd)(.*)");
+			if (std::regex_match(name, e)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		};
+
+		auto check_is_occlusion=[](std::string name){
+			std::regex e("(.*)(occ)(.*)");
+			if(std::regex_match(name, e)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		};
+
 		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
 			if (!its.isValid()) {
+				break;
+			}
+
+			std::string shape_name = its.shape->getName();
+			if(check_is_occlusion(shape_name)) {
+				break;
+			}
+
+			if(!check_is_ground_floor(shape_name)) {
+				//std::string log_str = shape_name + " is not ground";
 				break;
 			}
 
@@ -105,7 +136,7 @@ public:
 
 				if(value.isZero()) {
 					Spectrum shadow_value;
-					shadow_value.fromLinearRGB(0.0f, 0.5f, 0.0f);
+					shadow_value.fromLinearRGB(1.0f, 1.0f, 1.0f);
 					Li += throughput * shadow_value;
 				}
 			}

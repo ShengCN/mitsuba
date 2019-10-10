@@ -144,6 +144,12 @@
     <Filter Include="Source Files\integrators\shadow_integrator">
       <UniqueIdentifier>{e8220664-2ff0-40d4-adb4-b685319e7cb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\integrators\mask_integrator">
+      <UniqueIdentifier>{22f8faf7-de07-4c9f-a864-c4e7e3d1deb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\integrators\panorama_integrator">
+      <UniqueIdentifier>{e311f65e-c56c-4729-8d64-b3ffb95969c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup Label="Source Files">
     <ClCompile Include="..\src\bsdfs\blendbsdf.cpp">
@@ -1048,6 +1054,12 @@
     </ClCompile>
     <ClCompile Include="..\src\integrators\shadow_integrator\shadow_integrator.cpp">
       <Filter>Source Files\integrators\shadow_integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\integrators\mask_integrator\mask_integrator.cpp">
+      <Filter>Source Files\integrators\mask_integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\integrators\panorama_integrator\panorama_integrator.cpp">
+      <Filter>Source Files\integrators\panorama_integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup Label="Header Files">
