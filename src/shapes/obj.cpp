@@ -706,7 +706,9 @@ public:
                 *target_texcoords++ = vertexBuffer[i].uv;
         }
 
-        mesh->incRef();
+		mesh->incRef();
+		mesh->set_render_target(get_is_render_target());
+		mesh->set_ground_plane(get_is_render_ground());
         m_materialAssignment.push_back(materialName);
         m_meshes.push_back(mesh);
         Log(EInfo, "%s: " SIZE_T_FMT " triangles, " SIZE_T_FMT

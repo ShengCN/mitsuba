@@ -196,8 +196,6 @@ public:
      */
     virtual Shape *getElement(int i);
 
-	bool is_render_target() const { return m_is_render_target; }
-
     /**
      * \brief Return the shape's surface area
      *
@@ -468,9 +466,12 @@ public:
     /// Set the BSDF of this shape
     inline void setBSDF(BSDF *bsdf) { m_bsdf = bsdf; }
 
-	inline bool get_is_render_target() { return m_is_render_target; }
+	inline bool get_is_render_target() const { return m_is_render_target; }
 	inline void set_render_target(const bool &is_render_target) { m_is_render_target = is_render_target; }
-    /**
+	inline bool get_is_render_ground() const { return m_is_ground_plane; }
+	inline void set_ground_plane(const bool &is_ground) { m_is_ground_plane = is_ground; }
+
+	/**
      * \brief Return the number of primitives (triangles, hairs, ..)
      * contributed to the scene by this shape
      *
@@ -530,6 +531,7 @@ protected:
     ref<Medium> m_interiorMedium;
     ref<Medium> m_exteriorMedium;
 	bool m_is_render_target;
+	bool m_is_ground_plane;
 };
 
 MTS_NAMESPACE_END

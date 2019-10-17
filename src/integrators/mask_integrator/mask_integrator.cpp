@@ -62,7 +62,7 @@ public:
 			return Li;
 		}
 
-		if (its.shape->is_render_target() || (its.instance && its.instance->is_render_target())) {
+		if (its.shape->get_is_render_target()) {
 			Spectrum mask_color;
 			mask_color.fromLinearRGB(1.0f, 1.0f, 1.0f);
 			Li = mask_color;

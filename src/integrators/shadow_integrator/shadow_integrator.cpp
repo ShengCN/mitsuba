@@ -53,37 +53,12 @@ public:
 		Spectrum throughput(1.0f);
 		Float eta = 1.0f;
 
-		auto check_is_ground_floor=[](std::string name) {
-			std::regex e("(.*)(gd)(.*)");
-			if (std::regex_match(name, e)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		};
-
-		auto check_is_occlusion=[](std::string name){
-			std::regex e("(.*)(occ)(.*)");
-			if(std::regex_match(name, e)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		};
-
 		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
 			if (!its.isValid()) {
 				break;
 			}
 
-			std::string shape_name = its.shape->getName();
-			if(check_is_occlusion(shape_name)) {
-				break;
-			}
-
-			if(!check_is_ground_floor(shape_name)) {
+			if(!its.shape->get_is_render_ground()) {
 				//std::string log_str = shape_name + " is not ground";
 				break;
 			}
