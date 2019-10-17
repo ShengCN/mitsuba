@@ -53,31 +53,20 @@ public:
 		Spectrum throughput(1.0f);
 		Float eta = 1.0f;
 
-		auto check_is_occlusion=[](std::string name){
-			std::regex e("(.*)(occ)(.*)");
-			if(std::regex_match(name, e)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		};
+		//auto check_is_occlusion = [](const Intersection &its) {
+		//	its.shape->
+		//};
 
-		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
-			if (!its.isValid()) {
-				break;
-			}
+		
+		if (!its.isValid()) {
+			return Li;
+		}
 
-			std::string shape_name = its.shape->getName();
-			if(!check_is_occlusion(shape_name)) {
-				break;
-			}
+		if (its.shape->is_render_target() || (its.instance && its.instance->is_render_target())) {
 			Spectrum mask_color;
 			mask_color.fromLinearRGB(1.0f, 1.0f, 1.0f);
 			Li = mask_color;
-
-			break;
-		} 
+		}
 
 		return Li;
 	}

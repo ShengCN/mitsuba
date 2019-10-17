@@ -691,7 +691,6 @@
     </ClCompile>
     <ClCompile Include="..\src\integrators\mlt\mlt_proc.cpp">
     </ClCompile>
-    <ClCompile Include="..\src\integrators\panorama_integrator\panorama_integrator.cpp" />
     <ClCompile Include="..\src\integrators\path\path.cpp">
     </ClCompile>
     <ClCompile Include="..\src\integrators\path\volpath.cpp">
