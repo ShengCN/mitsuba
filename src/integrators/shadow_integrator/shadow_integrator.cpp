@@ -55,11 +55,13 @@ public:
 
 		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
 			if (!its.isValid()) {
+				Li = throughput;
 				break;
 			}
 
-			if(!its.shape->get_is_render_ground() && !its.shape->get_is_render_target()) {
+			if(!its.shape->get_is_render_ground() || its.shape->get_is_render_target()) {
 				//std::string log_str = shape_name + " is not ground";
+				Li = throughput;
 				break;
 			}
 
@@ -91,30 +93,20 @@ public:
 				Spectrum value = scene->sampleEmitterDirect(dRec, rRec.nextSample2D());
 
 				if(!value.isZero()) {
-					//const Emitter *emitter = static_cast<const Emitter *>(dRec.object);
-					//
-					///* Allocate a record for querying the BSDF */
-					//BSDFSamplingRecord bRec(its, its.toLocal(dRec.d), ERadiance);
+					/* one more condition here. compute if the occluder is the render target */
+					Ray occlusion_test_ray(dRec.ref, dRec.d, 0.0f);
+					Intersection occlusion_test_its;
+					if (scene->rayIntersect(occlusion_test_ray, occlusion_test_its)) {
+						if (occlusion_test_its.shape->get_is_render_target()) {
+							Li += throughput * value;
+							break;
+						}
+					}
 
-					///* Evaluate BSDF * cos(theta) */
-					//const Spectrum bsdfVal = bsdf->eval(bRec);
-
-					///* Prevent light leaks due to the use of shading normals */
-					//if(!bsdfVal.isZero() && (!m_strictNormals || dot(its.geoFrame.n, dRec.d) * Frame::cosTheta(bRec.wo) > 0)) {
-					//	/* Calculate prob. of having generated that direction using BSDF sampling */
-					//	Float bsdfPdf = (emitter->isOnSurface() && dRec.measure == ESolidAngle) ? bsdf->pdf(bRec) : 0;
-					//	Float weight = miWeight(dRec.pdf, bsdfPdf);
-					//	
-					//	Li += throughput * value * bsdfVal * weight;
-					//}
-					Li += throughput * value;
+					Li = throughput;
+					break;
 				}
 
-				//if(value.isZero()) {
-				//	Spectrum shadow_value;
-				//	shadow_value.fromLinearRGB(1.0f, 1.0f, 1.0f);
-				//	Li += throughput * shadow_value;
-				//}
 			}
 
 			break;

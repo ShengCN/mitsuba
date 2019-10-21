@@ -49,3 +49,4 @@ mitsuba.*.log
 .cproject
 .project
 dist.zip
+data/windows/
