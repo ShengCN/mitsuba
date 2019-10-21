@@ -147,6 +147,9 @@
     <Filter Include="Source Files\integrators\mask_integrator">
       <UniqueIdentifier>{22f8faf7-de07-4c9f-a864-c4e7e3d1deb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\integrators\env_integrator">
+      <UniqueIdentifier>{2aa7b966-06e6-46cd-84af-d7f0d54570de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup Label="Source Files">
     <ClCompile Include="..\src\bsdfs\blendbsdf.cpp">
@@ -1054,6 +1057,9 @@
     </ClCompile>
     <ClCompile Include="..\src\integrators\mask_integrator\mask_integrator.cpp">
       <Filter>Source Files\integrators\mask_integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\integrators\env_integrator\env_integrator.cpp">
+      <Filter>Source Files\integrators\env_integrator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup Label="Header Files">

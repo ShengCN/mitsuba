@@ -58,7 +58,7 @@ public:
 				break;
 			}
 
-			if(!its.shape->get_is_render_ground()) {
+			if(!its.shape->get_is_render_ground() && !its.shape->get_is_render_target()) {
 				//std::string log_str = shape_name + " is not ground";
 				break;
 			}
@@ -90,30 +90,31 @@ public:
 			if(rRec.type  & RadianceQueryRecord::EDirectSurfaceRadiance && (bsdf->getType() & BSDF::ESmooth)) {
 				Spectrum value = scene->sampleEmitterDirect(dRec, rRec.nextSample2D());
 
-				//if(!value.isZero()) {
-				//	const Emitter *emitter = static_cast<const Emitter *>(dRec.object);
-				//	
-				//	/* Allocate a record for querying the BSDF */
-				//	BSDFSamplingRecord bRec(its, its.toLocal(dRec.d), ERadiance);
+				if(!value.isZero()) {
+					//const Emitter *emitter = static_cast<const Emitter *>(dRec.object);
+					//
+					///* Allocate a record for querying the BSDF */
+					//BSDFSamplingRecord bRec(its, its.toLocal(dRec.d), ERadiance);
 
-				//	/* Evaluate BSDF * cos(theta) */
-				//	const Spectrum bsdfVal = bsdf->eval(bRec);
+					///* Evaluate BSDF * cos(theta) */
+					//const Spectrum bsdfVal = bsdf->eval(bRec);
 
-				//	/* Prevent light leaks due ot the use of shading normals */
-				//	if(!bsdfVal.isZero() && (!m_strictNormals || dot(its.geoFrame.n, dRec.d) * Frame::cosTheta(bRec.wo) > 0)) {
-				//		/* Calculate prob. of having generated that direction using BSDF sampling */
-				//		Float bsdfPdf = (emitter->isOnSurface() && dRec.measure == ESolidAngle) ? bsdf->pdf(bRec) : 0;
-				//		Float weight = miWeight(dRec.pdf, bsdfPdf);
-				//		
-				//		Li += throughput * value * bsdfVal * weight;
-				//	}
-				//}
-
-				if(value.isZero()) {
-					Spectrum shadow_value;
-					shadow_value.fromLinearRGB(1.0f, 1.0f, 1.0f);
-					Li += throughput * shadow_value;
+					///* Prevent light leaks due to the use of shading normals */
+					//if(!bsdfVal.isZero() && (!m_strictNormals || dot(its.geoFrame.n, dRec.d) * Frame::cosTheta(bRec.wo) > 0)) {
+					//	/* Calculate prob. of having generated that direction using BSDF sampling */
+					//	Float bsdfPdf = (emitter->isOnSurface() && dRec.measure == ESolidAngle) ? bsdf->pdf(bRec) : 0;
+					//	Float weight = miWeight(dRec.pdf, bsdfPdf);
+					//	
+					//	Li += throughput * value * bsdfVal * weight;
+					//}
+					Li += throughput * value;
 				}
+
+				//if(value.isZero()) {
+				//	Spectrum shadow_value;
+				//	shadow_value.fromLinearRGB(1.0f, 1.0f, 1.0f);
+				//	Li += throughput * shadow_value;
+				//}
 			}
 
 			break;

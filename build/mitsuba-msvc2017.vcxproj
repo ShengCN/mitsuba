@@ -670,6 +670,7 @@
     </ClCompile>
     <ClCompile Include="..\src\integrators\direct\direct.cpp">
     </ClCompile>
+    <ClCompile Include="..\src\integrators\env_integrator\env_integrator.cpp" />
     <ClCompile Include="..\src\integrators\erpt\erpt.cpp">
     </ClCompile>
     <ClCompile Include="..\src\integrators\erpt\erpt_proc.cpp">
