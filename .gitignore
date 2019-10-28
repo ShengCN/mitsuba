@@ -25,7 +25,7 @@ build/mitsuba-msvc2017.suo
 build/mitsuba-msvc2017.vcxproj.user
 build/.vs/**/*
 data/windows/mitsuba_res.res
-dist
+# dist
 
 # Debugging history files
 \.gdb_history
