@@ -54,12 +54,22 @@ public:
 		Float eta = 1.0f;
 
 		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
+			// hit nothing
 			if (!its.isValid()) {
 				Li = throughput;
 				break;
 			}
 
-			if(!its.shape->get_is_render_ground() || its.shape->get_is_render_target()) {
+			// when hit render target, ignore this hit, go straight
+			while(its.shape->get_is_render_target()) {
+				ray = Ray(its.p + ray.d * Epsilon, ray.d, ray.time);
+				if (!scene->rayIntersect(ray, its))
+					break;
+			}
+
+
+			// if not hit shadow receiver
+			if(!its.shape->get_is_render_ground()) {
 				//std::string log_str = shape_name + " is not ground";
 				Li = throughput;
 				break;
