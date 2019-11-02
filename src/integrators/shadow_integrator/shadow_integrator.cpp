@@ -62,7 +62,7 @@ public:
 
 			// when hit render target, ignore this hit, go straight
 			while(its.shape->get_is_render_target()) {
-				ray = Ray(its.p + ray.d * Epsilon, ray.d, ray.time);
+				ray = Ray(its.p, ray.d, ray.time);
 				if (!scene->rayIntersect(ray, its))
 					break;
 			}
