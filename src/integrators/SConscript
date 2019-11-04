@@ -40,4 +40,8 @@ plugins += bidirEnv.SharedLibrary('erpt',
         ['erpt/erpt.cpp', 'erpt/erpt_proc.cpp']
 )
 
+plugins += env.SharedLibrary('shadow_integrator', ['shadow_integrator/shadow_integrator.cpp'])
+plugins += env.SharedLibrary('mask_integrator', ['mask_integrator/mask_integrator.cpp'])
+plugins += env.SharedLibrary('env_integrator', ['env_integrator/env_integrator.cpp'])
+
 Export('plugins')

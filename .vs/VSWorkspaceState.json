@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\build",
+    "\\include",
+    "\\include\\mitsuba",
+    "\\src",
+    "\\src\\integrators",
+    "\\src\\integrators\\path",
+    "\\src\\integrators\\shadow_integrator"
+  ],
+  "SelectedNode": "\\src\\integrators\\path\\path.cpp",
+  "PreviewInSolutionExplorer": false
+}

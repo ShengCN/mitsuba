@@ -30,6 +30,8 @@ MTS_NAMESPACE_BEGIN
 Shape::Shape(const Properties &props)
  : ConfigurableObject(props) {
     m_name = props.getID();
+	m_is_render_target = props.getBoolean("render_target", false);
+	m_is_ground_plane = props.getBoolean("ground", false);
 }
 
 Shape::Shape(Stream *stream, InstanceManager *manager)
@@ -41,6 +43,8 @@ Shape::Shape(Stream *stream, InstanceManager *manager)
     m_sensor = static_cast<Sensor *>(manager->getInstance(stream));
     m_interiorMedium = static_cast<Medium *>(manager->getInstance(stream));
     m_exteriorMedium = static_cast<Medium *>(manager->getInstance(stream));
+	m_is_render_target = stream->readBool();
+	m_is_ground_plane = stream->readBool();
 }
 
 Shape::~Shape() { }
@@ -193,6 +197,8 @@ void Shape::serialize(Stream *stream, InstanceManager *manager) const {
     manager->serialize(stream, m_sensor.get());
     manager->serialize(stream, m_interiorMedium.get());
     manager->serialize(stream, m_exteriorMedium.get());
+	stream->writeBool(m_is_render_target);
+	stream->writeBool(m_is_ground_plane);
 }
 
 Float Shape::getSurfaceArea() const { NotImplementedError("getSurfaceArea"); }
@@ -244,6 +250,8 @@ void Shape::copyAttachments(Shape *shape) {
     m_subsurface = shape->getSubsurface();
     m_interiorMedium = shape->getInteriorMedium();
     m_exteriorMedium = shape->getInteriorMedium();
+	m_is_render_target = shape->get_is_render_target();
+	m_is_ground_plane = shape->get_is_render_ground();
 }
 
 ref<TriMesh> Shape::createTriMesh() {
