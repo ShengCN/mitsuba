@@ -54,19 +54,18 @@ public:
 		Float eta = 1.0f;
 
 		while(rRec.depth <= m_maxDepth || m_maxDepth < 0) {
-			// hit nothing
-			if (!its.isValid()) {
-				Li = throughput;
-				break;
-			}
-
 			// when hit render target, ignore this hit, go straight
-			while(its.shape->get_is_render_target()) {
+			while (its.shape->get_is_render_target()) {
 				ray = Ray(its.p, ray.d, ray.time);
 				if (!scene->rayIntersect(ray, its))
 					break;
 			}
 
+			// hit nothing
+			if (!its.isValid()) {
+				Li = throughput;
+				break;
+			} 
 
 			// if not hit shadow receiver
 			if(!its.shape->get_is_render_ground()) {
@@ -76,23 +75,6 @@ public:
 			}
 
 			const BSDF *bsdf = its.getBSDF(ray);
-
-			/* Possibly include emitted radiance*/
-			if(its.isEmitter() && (rRec.type & RadianceQueryRecord::EEmittedRadiance) && (!m_hideEmitters || scattered)) {
-				/*Li += throughput * its.Le(-ray.d);*/
-				break;
-			}
-			
-			if((rRec.depth >= m_maxDepth && m_maxDepth > 0) || (m_strictNormals && dot(ray.d, its.geoFrame.n) * Frame::cosTheta(its.wi) >=0)) {
-				/*
-					Only continue if: 
-						1. The current path lenght is below the specified maximum
-						2. If 'strictNormals' = true, when the geometric and shading 
-						   normals classify the incident direction to the same side
-				*/
-
-				break;
-			}
 
 			/* ==================================================================== */
 			/*                     Direct illumination sampling                     */

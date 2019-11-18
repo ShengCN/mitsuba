@@ -92,7 +92,8 @@ union PixelRGBA8Group
 inline mitsuba::math::SSEVector4f am_log(const mitsuba::math::SSEVector4f& x) {
     typedef mitsuba::math::SSEVector4f v4f;
     typedef mitsuba::math::SSEVector4i v4i;
-    using mitsuba::math::castAsFloat;
+    
+	::math::castAsFloat;
     using mitsuba::math::clamp_ps;
     using mitsuba::math::fastpow_ps;
 
