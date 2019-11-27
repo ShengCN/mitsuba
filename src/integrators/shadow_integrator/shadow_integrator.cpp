@@ -75,7 +75,11 @@ public:
 			}
 
 			const BSDF *bsdf = its.getBSDF(ray);
+			if (!bsdf) {
 
+				std::cerr << "BSDF does not exist \n";
+				return Li;
+			}
 			/* ==================================================================== */
 			/*                     Direct illumination sampling                     */
 			/* ==================================================================== */
