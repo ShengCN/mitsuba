@@ -62,11 +62,10 @@ public:
 
 			// when hit render target, ignore this hit, go straight
 			while(its.shape->get_is_render_target()) {
-				ray = Ray(its.p, ray.d, ray.time);
-				if (!scene->rayIntersect(ray, its))
+				Ray cur_ray = Ray(its.p, ray.d, ray.time);
+				if (!scene->rayIntersect(cur_ray, its))
 					break;
 			}
-
 
 			// if not hit shadow receiver
 			if(!its.shape->get_is_render_ground()) {
