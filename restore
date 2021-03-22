@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo apt-get install linux-hwe-5.4-headers-5.4.0-66
